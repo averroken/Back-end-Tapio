@@ -117,7 +117,7 @@ app.post('/api/landmarks', function(req, res) {
     var newLandmark = req.body;
     newLandmark.createDate = new Date();
 
-    if (!(req.body.Naam && req.body.Locatie)){
+    if (!(req.body.Naam || req.body.Locatie)){
         handleError(res, "Invalid user input", "Must provide a name and discription", 400);
     }
 
