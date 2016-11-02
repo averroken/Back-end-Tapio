@@ -5,6 +5,7 @@ var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 
 var CONTACTS_COLLECTION = 'contacts';
+var LANDMARKS_COLLECTION = 'Landmarks';
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -98,6 +99,16 @@ app.get('/firstName/:firstName', function (req, res) {
             handleError(res, err.message, "Failed to get contact");
         }else {
             res.status(200).json(doc);
+        }
+    });
+});
+
+app.get('/api/landmarks', function(req, res) {
+    db.collection(LANDMARKS_COLLECTION).find({}).toArray(function (err, docs) {
+        if (err){
+            handleError(res, err.message, "Failed to get contacts.");
+        }else{
+            res.status(200).json(docs);
         }
     });
 });
