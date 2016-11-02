@@ -13,7 +13,8 @@ app.use(bodyParser.json());
 
 var db;
 
-var connectie = process.env.MONGODB_URI;
+//var connectie = process.env.MONGODB_URI;
+var connectie = "mongodb://localhost:27017";
 mongodb.MongoClient.connect(connectie, function(err, database){
     if(err){
         console.log(err);
