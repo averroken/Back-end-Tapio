@@ -112,3 +112,20 @@ app.get('/api/landmarks', function(req, res) {
         }
     });
 });
+
+app.post('/api/landmarks', function(req, res) {
+    var newLandmark = req.body;
+    newLandmark.createDate = new Date();
+
+    if (!(req.body.Naam && req.body.Locatie)){
+        handleError(res, "Invalid user input", "Must provide a name and discription", 400);
+    }
+
+    db.collection(LANDMARKS_COLLECTION).insertOne(newLandmark, function (err, doc) {
+        if (err){
+            handleError(res, err.message, "Failed to create new contact.");
+        }else {
+            res.status(201).json(doc.ops[0]);
+        }
+    });
+});
