@@ -129,3 +129,21 @@ app.post('/api/landmarks', function(req, res) {
         }
     });
 });
+
+// [
+//     {
+//         "Naam": "Mijn derde Landmark",
+//         "Description": "Blablabla",
+//         "Type": "Natuur",
+//         "Afstand": 845,
+//         "Locatie": [
+//             {
+//                 "lon": 54,
+//                 "lat": 52
+//             }
+//         ],
+//         "ImageURLBig": "https://www.google.be/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwiM_rr9m4jQAhVFaxQKHTmWASsQjRwIBw&url=https%3A%2F%2Fplay.goog.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dde.lotumapps.vibes&psig=AFQjCNGUoaqgYXl2i0s9isnDCpTZaaBt1g&ust=1478112412918875",
+//         "Visits": 28,
+//         "Likes": 35
+//     }
+// ]
