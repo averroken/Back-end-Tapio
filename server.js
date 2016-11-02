@@ -6,6 +6,7 @@ var ObjectID = mongodb.ObjectID;
 
 var CONTACTS_COLLECTION = 'contacts';
 var LANDMARKS_COLLECTION = 'Landmarks';
+var MAP_COLLECTION = 'Map';
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -106,7 +107,10 @@ function handleError(res, reason, message, code){
 // });
 
 app.get('/api/landmarks', function(req, res) {
-    db.collection(LANDMARKS_COLLECTION).find({}).toArray(function (err, docs) {
+    db.collection(LANDMARKS_COLLECTION).find({
+    },{
+        "Naam": 1
+    }).toArray(function (err, docs) {
         if (err){
             handleError(res, err.message, "Failed to get contacts.");
         }else{
@@ -114,12 +118,11 @@ app.get('/api/landmarks', function(req, res) {
         }
     });
 });
-
 app.post('/api/landmarks', function(req, res) {
     var newLandmark = req.body;
     newLandmark.createDate = new Date();
 
-    if (!(req.body.Naam || req.body.Locatie)){
+    if (!(req.body.Naam || !req.body.Locatie)){
         handleError(res, "Invalid user input", "Must provide a name and discription", 400);
     }
 
@@ -132,6 +135,37 @@ app.post('/api/landmarks', function(req, res) {
     });
 });
 
+
+app.get('/api/map', function(req, res) {
+    db.collection(MAP_COLLECTION).find({
+    },{
+        "Type": 1,
+        "Locatie" : 1
+    }).toArray(function (err, docs) {
+        if (err){
+            handleError(res, err.message, "Failed to get contacts.");
+        }else{
+            res.status(200).json(docs);
+        }
+    });
+});
+
+app.post('/api/map', function(req, res) {
+    var newMap = req.body;
+    newMap.createDate = new Date();
+
+    if (!(req.body.Type || !req.body.Locatie)){
+        handleError(res, "Invalid user input", "Must provide a name and discription", 400);
+    }
+
+    db.collection(MAP_COLLECTION).insertOne(newMap, function (err, doc) {
+        if (err){
+            handleError(res, err.message, "Failed to create new contact.");
+        }else {
+            res.status(201).json(doc.ops[0]);
+        }
+    });
+});
 // [
 //     {
 //         "Naam": "Mijn derde Landmark",
