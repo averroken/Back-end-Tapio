@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 var db;
 
 var connectie = process.env.MONGODB_URI;
+var connectie = "mongodb://localhost:27017/Tapio"
 mongodb.MongoClient.connect(connectie, function(err, database){
     if(err){
         console.log(err);
@@ -56,13 +57,13 @@ app.post('/api/landmarks', function(req, res) {
         if (err){
             handleError(res, err.message, "Failed to create new contact.");
         }else {
-            res.status(201).json(doc.ops[0]);
+            res.status(201).json({"message":"Successfully created landmark"});
         }
     });
 });
 
 
-app.get('/api/map', function(req, res) {
+app.get('/api/landmarks/short', function(req, res) {
     db.collection(LANDMARKS_COLLECTION).find({
     },{
         "Type": 1,
@@ -72,6 +73,16 @@ app.get('/api/map', function(req, res) {
             handleError(res, err.message, "Failed to get contacts.");
         }else{
             res.status(200).json(docs);
+        }
+    });
+});
+
+app.get('/api/landmark/:id', function(req, res) {
+    db.collection(LANDMARKS_COLLECTION).find({}).toArray(function (err, docs) {
+        if (err){
+            handleError(res, err.message, "Failed to get contacts.");
+        }else{
+            res.status(200).json({"landmarks":docs});
         }
     });
 });
