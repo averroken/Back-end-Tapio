@@ -131,20 +131,34 @@ app.post('/api/landmarks', function(req, res) {
     });
 });
 
-// [
-//     {
-//         "Naam": "Mijn derde Landmark",
-//         "Description": "Blablabla",
-//         "Type": "Natuur",
-//         "Afstand": 845,
-//         "Locatie": [
-//             {
-//                 "lon": 54,
-//                 "lat": 52
-//             }
-//         ],
-//         "ImageURLBig": "https://www.google.be/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwiM_rr9m4jQAhVFaxQKHTmWASsQjRwIBw&url=https%3A%2F%2Fplay.goog.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dde.lotumapps.vibes&psig=AFQjCNGUoaqgYXl2i0s9isnDCpTZaaBt1g&ust=1478112412918875",
-//         "Visits": 28,
-//         "Likes": 35
-//     }
-// ]
+
+app.get('/api/map', function(req, res) {
+    db.collection(MAP_COLLECTION).find({
+    },{
+        "Type": 1,
+        "Locatie" : 1
+    }).toArray(function (err, docs) {
+        if (err){
+            handleError(res, err.message, "Failed to get contacts.");
+        }else{
+            res.status(200).json(docs);
+        }
+    });
+});
+
+app.post('/api/map', function(req, res) {
+    var newMap = req.body;
+    newMap.createDate = new Date();
+
+    if (!(req.body.Type || !req.body.Locatie)){
+        handleError(res, "Invalid user input", "Must provide a name and discription", 400);
+    }
+
+    db.collection(MAP_COLLECTION).insertOne(newMap, function (err, doc) {
+        if (err){
+            handleError(res, err.message, "Failed to create new contact.");
+        }else {
+            res.status(201).json(doc.ops[0]);
+        }
+    });
+});
