@@ -66,6 +66,7 @@ app.post('/api/landmarks', function(req, res) {
 app.get('/api/landmarks/short', function(req, res) {
     db.collection(LANDMARKS_COLLECTION).find({
     },{
+        "Naam":1,
         "Type": 1,
         "Locatie" : 1
     }).toArray(function (err, docs) {
@@ -77,7 +78,7 @@ app.get('/api/landmarks/short', function(req, res) {
     });
 });
 
-app.get('/api/landmark/', function(req, res) {
+app.get('/api/landmark/id/', function(req, res) {
     db.collection(LANDMARKS_COLLECTION).findOne({ _id: new ObjectID(req.query.id)}, function (err, docs) {
         if (err){
             handleError(res, err.message, "Failed to get contacts.");
@@ -86,14 +87,3 @@ app.get('/api/landmark/', function(req, res) {
         }
     });
 });
-
-
-// app.get("/contacts/id/:id", function(req, res) {
-//     db.collection(CONTACTS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
-//         if (err) {
-//             handleError(res, err.message, "Failed to get contact");
-//         } else {
-//             res.status(200).json(doc);
-//         }
-//     });
-// });
