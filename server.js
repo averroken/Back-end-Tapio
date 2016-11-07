@@ -4,9 +4,7 @@ var bodyParser = require('body-parser');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 
-var CONTACTS_COLLECTION = 'contacts';
 var LANDMARKS_COLLECTION = 'Landmarks';
-var MAP_COLLECTION = 'Map';
 
 var app = express();
 app.use(express.static(__dirname + "/public"));
@@ -14,9 +12,9 @@ app.use(bodyParser.json());
 
 var db;
 
-//var connectie = process.env.MONGODB_URI;
-var connectie = "mongodb://localhost:27017";
-mongodb.MongoClient.connect(connectie, function(err, database){
+var connection = process.env.MONGODB_URI;
+//var connection = "mongodb://localhost:27017/Tapio";
+mongodb.MongoClient.connect(connection, function(err, database){
     if(err){
         console.log(err);
         process.exit(1);
@@ -36,150 +34,55 @@ function handleError(res, reason, message, code){
     res.status(code || 500).json({"error" : message});
 }
 
-// app.get('/contacts', function(req, res) {
-//     db.collection(CONTACTS_COLLECTION).find({}).toArray(function (err, docs) {
-//         if (err){
-//             handleError(res, err.message, "Failed to get contacts.");
-//         }else{
-//             res.status(200).json(docs);
-//         }
-//     });
-// });
-//
-// app.post('/contacts', function(req, res) {
-//     var newContact = req.body;
-//     newContact.createDate = new Date();
-//
-//     if (!(req.body.firstName || req.body.lastName)){
-//         handleError(res, "Invalid user input", "Must provide a first or last name", 400);
-//     }
-//
-//     db.collection(CONTACTS_COLLECTION).insertOne(newContact, function (err, doc) {
-//         if (err){
-//             handleError(res, err.message, "Failed to create new contact.");
-//         }else {
-//             res.status(201).json(doc.ops[0]);
-//         }
-//     });
-// });
-//
-// /*  "/contacts/:id"
-//  *    GET: find contact by id
-//  *    PUT: update contact by id
-//  *    DELETE: deletes contact by id
-//  */
-//
-// app.get("/contacts/id/:id", function(req, res) {
-//     db.collection(CONTACTS_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
-//         if (err) {
-//             handleError(res, err.message, "Failed to get contact");
-//         } else {
-//             res.status(200).json(doc);
-//         }
-//     });
-// });
-//
-// // app.put('/contacts/:id', function (req, res) {
-// //     var updateDoc = req.body;
-// //     delete updateDoc._id;
-// //
-// //     db.collection(CONTACTS_COLLECTION).updateOne({_id: new ObjectID(req.params.id)}, updateDoc, function (err, doc) {
-// //         if (err){
-// //             handleError(res, err.message, "Failed to update contact");
-// //         }else{
-// //             res.status(204).end
-// //         }
-// //     })
-// // });
-//
-// // app.delete('/contacts/:id', function (req, res) {
-// //
-// // });
-//
-// app.get('/firstName/:firstName', function (req, res) {
-//     db.collection(CONTACTS_COLLECTION).findOne({firstName: req.params.firstName}, function(err, doc) {
-//         if(err){
-//             handleError(res, err.message, "Failed to get contact");
-//         }else {
-//             res.status(200).json(doc);
-//         }
-//     });
-// });
-
 app.get('/api/landmarks', function(req, res) {
-    db.collection(LANDMARKS_COLLECTION).find({
-    },{
-        "Naam": 1
-    }).toArray(function (err, docs) {
+    db.collection(LANDMARKS_COLLECTION).find({}).toArray(function (err, docs) {
         if (err){
-            handleError(res, err.message, "Failed to get contacts.");
+            handleError(res, err.message, "Failed to get landmarks.");
         }else{
-            res.status(200).json(docs);
+            res.status(200).json({"landmarks":docs});
         }
     });
 });
+
 app.post('/api/landmarks', function(req, res) {
     var newLandmark = req.body;
     newLandmark.createDate = new Date();
 
-    if (!(req.body.Naam || !req.body.Locatie)){
-        handleError(res, "Invalid user input", "Must provide a name and discription", 400);
+    if (!(req.body.Naam || req.body.Locatie)){
+        handleError(res, "Invalid user input", "Must provide a name and description", 400);
     }
 
     db.collection(LANDMARKS_COLLECTION).insertOne(newLandmark, function (err, doc) {
         if (err){
-            handleError(res, err.message, "Failed to create new contact.");
+            handleError(res, err.message, "Failed to create new landmark.");
         }else {
-            res.status(201).json(doc.ops[0]);
+            res.status(201).json({"message":"Successfully created landmark"});
         }
     });
 });
 
 
-app.get('/api/map', function(req, res) {
-    db.collection(MAP_COLLECTION).find({
+app.get('/api/landmarks/short', function(req, res) {
+    db.collection(LANDMARKS_COLLECTION).find({
     },{
+        "Name":1,
         "Type": 1,
-        "Locatie" : 1
+        "Location" : 1
     }).toArray(function (err, docs) {
         if (err){
-            handleError(res, err.message, "Failed to get contacts.");
+            handleError(res, err.message, "Failed to get landmarks.");
         }else{
             res.status(200).json(docs);
         }
     });
 });
 
-app.post('/api/map', function(req, res) {
-    var newMap = req.body;
-    newMap.createDate = new Date();
-
-    if (!(req.body.Type || !req.body.Locatie)){
-        handleError(res, "Invalid user input", "Must provide a name and discription", 400);
-    }
-
-    db.collection(MAP_COLLECTION).insertOne(newMap, function (err, doc) {
+app.get('/api/landmark/id/', function(req, res) {
+    db.collection(LANDMARKS_COLLECTION).findOne({ _id: new ObjectID(req.query.id)}, function (err, docs) {
         if (err){
-            handleError(res, err.message, "Failed to create new contact.");
-        }else {
-            res.status(201).json(doc.ops[0]);
+            handleError(res, err.message, "Failed to get landmarks.");
+        }else{
+            res.status(200).json({"landmarks":docs});
         }
     });
 });
-// [
-//     {
-//         "Naam": "Mijn derde Landmark",
-//         "Description": "Blablabla",
-//         "Type": "Natuur",
-//         "Afstand": 845,
-//         "Locatie": [
-//             {
-//                 "lon": 54,
-//                 "lat": 52
-//             }
-//         ],
-//         "ImageURLBig": "https://www.google.be/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwiM_rr9m4jQAhVFaxQKHTmWASsQjRwIBw&url=https%3A%2F%2Fplay.goog.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dde.lotumapps.vibes&psig=AFQjCNGUoaqgYXl2i0s9isnDCpTZaaBt1g&ust=1478112412918875",
-//         "Visits": 28,
-//         "Likes": 35
-//     }
-// ]
